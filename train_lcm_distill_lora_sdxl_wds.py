@@ -1378,7 +1378,7 @@ def main(args):
         # delete the "unet." from model state dict keys
         tensors = {}
         model_path = os.path.join(output_path, "pytorch_lora_weights.safetensors")
-        with safe_open(model_path, framework="pt", device=accelerate.device) as f:
+        with safe_open(model_path, framework="pt", device=0) as f:
             for k in f.keys():
                 new_key = k.replace("unet.", "", 1)
                 tensors[new_key] = f.get_tensor(k)
