@@ -2,6 +2,18 @@
 
 This script is used to train a model with latent consistency distillation. Fixed some bugs from https://github.com/huggingface/diffusers/blob/main/examples/consistency_distillation/train_lcm_distill_lora_sdxl_wds.py
 
+
+## ⭐ library version
+```
+cuda: 11.7
+pytorch: 2.0.1+cu117
+transformers: 4.35.0
+diffusers: 0.23.0
+accelerate: 0.24.1
+peft: 0.6.1
+webdataset: 0.2.69
+```
+
 ## Bug1: Training stuck at 0%
 👉https://github.com/huggingface/diffusers/issues/5743
 
