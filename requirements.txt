@@ -1,0 +1,12 @@
+# cuda: 11.7
+# pytorch: 2.0.1+cu117
+# torchvision
+# xformers
+transformers==4.35.0
+diffusers==0.23.0
+accelerate==0.24.1
+peft==0.6.1
+ftfy
+tensorboard
+wandb
+Jinja2

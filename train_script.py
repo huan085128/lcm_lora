@@ -1,32 +1,46 @@
 import subprocess
 
-# Set parameters
-pretrained_teacher_model = "/mnt/private/models/stable-diffusion-xl-base-1.0"
-train_shards_path_or_url = "/mnt/private/lcm_finetune/train_test3.tar"
-output_dir = "/mnt/private/lcm_finetune/lcm-xl-distilled1"
+# ----------Model Checkpoint Loading Arguments----------
+pretrained_teacher_model = "stabilityai/stable-diffusion-xl-base-1.0"
+pretrained_vae_model_name_or_path = "madebyollin/sdxl-vae-fp16-fix"
+train_data_dir = "path/to/datasets"
+output_dir = "path/to/saved/model"
 
+# ----------Training Arguments----------
 resolution = 1024
+
+# please dont't open center_crop
 center_crop = False
+
 random_flip = False
 xformers = True
-use_fix_crop_and_size = False
 gradient_checkpointing = False
-use_8bit_adam = False
+use_aspect_ratio_bucket = True
+use_8bit_adam = True
 
 max_train_steps = 10000
 
 mixed_precision = "fp16"
-dataloader_num_workers = 8
-max_train_samples = 1746
+dataloader_num_workers = 0
 train_batch_size = 4
-gradient_accumulation_steps = 4
+gradient_accumulation_steps = 1
 num_train_epochs = 30
-checkpointing_steps = 1000
-learning_rate = 1e-04
+checkpointing_steps = 5000
+learning_rate = 1e-06
 lr_scheduler = "constant"
 lr_warmup_steps = 0
-report_to = "tensorboard"
-validation_steps = 10
+report_to = "wandb"
+validation_steps = 1
+
+seed = 42
+
+# ----bucketing parameters----
+debug_prompt = False
+debug_arb = False
+arb_dim_limit = 1024
+arb_min_dim = 512
+arb_divisible = 64
+arb_max_ar_error = 4
 
 # ----Latent Consistency Distillation (LCD) Specific Arguments----
 w_min = 3.0
@@ -34,22 +48,21 @@ w_max = 15.0
 num_ddim_timesteps = 50
 loss_type = "l2"
 huber_c = 0.001
-lora_rank = 64
+lora_rank = 128
 
 # Construct arguments list for the training script
 train_args = [
     f"--pretrained_teacher_model={pretrained_teacher_model}",
-    f"--train_shards_path_or_url={train_shards_path_or_url}",
+    f"--train_data_dir={train_data_dir}",
     f"--output_dir={output_dir}",
     f"--resolution={resolution}",
     f"--dataloader_num_workers={dataloader_num_workers}",
-    f"--max_train_samples={max_train_samples}",
     "--center_crop" if center_crop else "",
     "--random_flip" if random_flip else "",
     "--enable_xformers_memory_efficient_attention" if xformers else "",
-    "--use_fix_crop_and_size" if use_fix_crop_and_size else "",
     f"--train_batch_size={train_batch_size}",
     f"--gradient_accumulation_steps={gradient_accumulation_steps}",
+    "--use_aspect_ratio_bucket" if use_aspect_ratio_bucket else "",
     "--gradient_checkpointing" if gradient_checkpointing else "",
     "--use_8bit_adam" if use_8bit_adam else "",
     f"--max_train_steps={max_train_steps}",
@@ -61,6 +74,13 @@ train_args = [
     f"--report_to={report_to}",
     f"--mixed_precision={mixed_precision}",
     f"--validation_steps={validation_steps}",
+    f"--seed={seed}",
+    "--debug_prompt" if debug_prompt else "",
+    "--debug_arb" if debug_arb else "",
+    f"--arb_dim_limit={arb_dim_limit}",
+    f"--arb_min_dim={arb_min_dim}",
+    f"--arb_divisible={arb_divisible}",
+    f"--arb_max_ar_error={arb_max_ar_error}",
     f"--w_min={w_min}",
     f"--w_max={w_max}",
     f"--num_ddim_timesteps={num_ddim_timesteps}",
@@ -69,7 +89,7 @@ train_args = [
     f"--lora_rank={lora_rank}",
 ]
 
-train_script = "train_lcm_distill_lora_sdxl_wds.py"
+train_script = "train_lcm_distill_sdxl_lora.py"
 
 train_args = [arg for arg in train_args if arg]
 
