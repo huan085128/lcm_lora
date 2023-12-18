@@ -2,6 +2,9 @@
 
 **This script is used to train a model with latent consistency distillation.**
 
+- **test_train_lcm_lora_bucket.py** is not memory optimization
+- **train_lcm_distill_sdxl_lora.py.py** with memory optimization
+
 #### Reference
 https://github.com/huggingface/diffusers/blob/main/examples/consistency_distillation/train_lcm_distill_lora_sdxl_wds.py
 
